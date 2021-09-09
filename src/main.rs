@@ -138,7 +138,7 @@ fn main() {
     }
     let mut rng_clone = MT {
         array: untempered,
-        index: input_ints.len(),
+        index: input_ints.len() % N,
     };
     for _ in 0..10 {
         println!("{}", rng_clone.extract_number());
