@@ -1,5 +1,6 @@
 use std::io::prelude::*;
 
+// COPIED from https://github.com/dcrewi/rust-mersenne-twister
 const F: u32 = 1812433253;
 const W: u32 = 32;
 const N: usize = 624;
@@ -138,7 +139,7 @@ fn main() {
     }
     let mut rng_clone = MT {
         array: untempered,
-        index: input_ints.len() % N,
+        index: N,
     };
     for _ in 0..10 {
         println!("{}", rng_clone.extract_number());
