@@ -128,49 +128,27 @@ fn main() {
     for line in std::io::stdin().lock().lines() {
         input_ints.push(line.expect("io error").trim().parse().expect("invalid int"));
     }
-
-    // The RNG has a period of N (624), but we don't know where it is in that period. We need to
-    // try all possible starting offsets, checking each one to see whether taking N ints from that
-    // offset leads to matching output.
-    const ELEMENTS_TO_CHECK: usize = 10;
-    let mut start = 0;
-    let mut rng_clone = loop {
-        if start + N + ELEMENTS_TO_CHECK > input_ints.len() {
-            eprintln!("not enough ints");
-            std::process::exit(1);
-        }
-        let mut untempered = [0; N];
-        for i in 0..N {
-            untempered[i] = untemper(input_ints[start + i]);
-        }
-        let mut rng_clone = MT {
-            array: untempered,
-            index: N,
-        };
-        let mut bad_generator = false;
-        for i in 0..ELEMENTS_TO_CHECK {
-            if input_ints[start + N + i] != rng_clone.extract_number() {
-                // This start offset doesn't work.
-                bad_generator = true;
-            }
-        }
-        if bad_generator {
-            start += 1;
-        } else {
-            // This offset works!
-            break rng_clone;
-        }
+    if input_ints.len() < N {
+        eprintln!("needs {} ints", N);
+        std::process::exit(1);
+    }
+    let mut untempered = [0; N];
+    for i in 0..N {
+        untempered[i] = untemper(input_ints[i]);
+    }
+    let mut rng_clone = MT {
+        array: untempered,
+        index: N,
     };
 
-    // If we get here, we've found the right starting offset and rng_clone is correctly
-    // initialized. Run it to the end of the provided ints.
-    let elements_to_skip = input_ints.len() - start - N - ELEMENTS_TO_CHECK;
-    for _ in 0..elements_to_skip {
-        rng_clone.extract_number();
+    // rng_clone is now correctly initialized, and N input ints have been "consumed". Run the RNG
+    // forward to the end of the input stream.
+    for i in N..input_ints.len() {
+        assert_eq!(rng_clone.extract_number(), input_ints[i]);
     }
 
-    // Finally, print the next few elements after what was provided.
-    for _ in 0..ELEMENTS_TO_CHECK {
+    // Finally, print the next few elements after the end of the input stream.
+    for _ in 0..10 {
         println!("{}", rng_clone.extract_number());
     }
 }
