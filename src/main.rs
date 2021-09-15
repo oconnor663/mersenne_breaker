@@ -77,16 +77,6 @@ fn undo_right_shift_xor_mask(mut y: u32, shift: u32, mask: u32) -> u32 {
     y
 }
 
-#[test]
-fn test_undo_right_shift_xor() {
-    for shift in 1..32 {
-        dbg!(shift);
-        let y = 0x1fd72a03;
-        let shifted = y ^ (y >> shift);
-        assert_eq!(y, undo_right_shift_xor_mask(shifted, shift, !0));
-    }
-}
-
 fn undo_left_shift_xor_mask(mut y: u32, shift: u32, mask: u32) -> u32 {
     // One bit at a time.
     for bit_index in (0..32).rev() {
@@ -96,16 +86,6 @@ fn undo_left_shift_xor_mask(mut y: u32, shift: u32, mask: u32) -> u32 {
         }
     }
     y
-}
-
-#[test]
-fn test_undo_left_shift_xor() {
-    for shift in 1..32 {
-        dbg!(shift);
-        let y = 0x1fd72a03;
-        let shifted = y ^ (y << shift);
-        assert_eq!(y, undo_left_shift_xor_mask(shifted, shift, !0));
-    }
 }
 
 fn untemper(mut y: u32) -> u32 {
